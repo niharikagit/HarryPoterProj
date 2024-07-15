@@ -1,0 +1,34 @@
+import { Component } from '@angular/core';
+import { MovieServiceService } from '../services/movie-service.service';
+import { Observable } from 'rxjs';
+import { movies } from '../model/movie-model';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { FormatHoursPipe } from '../pipes/format-hours.pipe';
+import { RouterLink } from '@angular/router';
+
+@Component({
+  selector: 'app-movie-listings',
+  standalone: true,
+  imports: [FormsModule, CommonModule, FormatHoursPipe, RouterLink],
+  templateUrl: './movie-list.component.html',
+  styleUrl: './movie-list.component.css'
+})
+export class MovieListComponent {
+  public allList$ = new Observable<movies[]>;
+  public title: string = '';
+  public release_date: string = '';
+  constructor(private movieService: MovieServiceService){
+
+  }
+  ngOnInit(){
+    this.movieService.getMovies();
+    this.allList$ = this.movieService.movieList$;
+  }
+  filterValueChanges(event: {}){
+    let filterData = <movies>{};
+    filterData.title = this.title;
+    filterData.release_date = this.release_date;
+    this.movieService.getMovies(filterData);
+  }
+}
